@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpamGuard AI – Spam Email Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<header class="nav">
+  <a href="#home" class="brand"><i class="fa-solid fa-shield-halved"></i> SpamGuard AI</a>
+  <nav id="menu" class="links">
+    <a href="#home">Home</a>
+    <a href="#classifier">Classifier</a>
+    <a href="#how">How It Works</a>
+    <a href="#about">About</a>
+    <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div class="nav-actions">
+    <button id="themeBtn" class="icon-btn" aria-label="Toggle dark/light mode"><i class="fa-solid fa-moon"></i></button>
+    <a href="#classifier" class="btn btn-primary hide-sm">Try Classifier</a>
+    <button id="burger" class="icon-btn burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<main>
+<!-- ========== HERO ========== -->
+<section id="home" class="hero">
+  <div class="hero-text">
+    <h1>AI-Powered Spam Email Classifier</h1>
+    <p class="sub">Detect suspicious and unwanted emails using Machine Learning.</p>
+    <div class="row">
+      <a href="#classifier" class="btn btn-primary"><i class="fa-solid fa-envelope-circle-check"></i> Check Email</a>
+      <a href="#how" class="btn btn-ghost">How It Works</a>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <!-- Envelope + shield illustration -->
+    <svg viewBox="0 0 420 340" role="img">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f8cff"/><stop offset="1" stop-color="#9b5cff"/></linearGradient>
+      </defs>
+      <circle cx="210" cy="170" r="150" fill="url(#g1)" opacity=".12"/>
+      <rect x="50" y="90" width="240" height="160" rx="18" fill="rgba(255,255,255,.08)" stroke="url(#g1)" stroke-width="3"/>
+      <path d="M58 102 L170 185 L282 102" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M300 70 L370 95 V165 C370 215 335 245 300 260 C265 245 230 215 230 165 V95 Z" fill="url(#g1)"/>
+      <path d="M270 165 L292 187 L333 140" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <g fill="#ff5a6e"><circle cx="70" cy="60" r="9"/><circle cx="330" cy="290" r="6"/></g>
+      <g fill="#38d9a0"><circle cx="110" cy="290" r="7"/><circle cx="385" cy="40" r="5"/></g>
+    </svg>
+  </div>
+  <div class="hero-stats">
+    <div><i class="fa-solid fa-brain"></i><b>Machine Learning</b><span>Powered</span></div>
+    <div><i class="fa-solid fa-bolt"></i><b>Real-Time</b><span>Prediction</span></div>
+    <div><i class="fa-solid fa-ban"></i><b>Spam</b><span>Detection</span></div>
+    <div><i class="fa-solid fa-bullseye"></i><b id="heroAcc">--%</b><span>Accuracy (measured)</span></div>
+  </div>
+</section>
+
+<!-- ========== CLASSIFIER ========== -->
+<section id="classifier" class="section">
+  <h2>Analyze Your Email</h2>
+  <div class="grid-2">
+    <div class="glass">
+      <textarea id="emailInput" rows="10" maxlength="10000" placeholder="Paste your email content here..."></textarea>
+      <div class="tools">
+        <span id="counter" class="muted">0 / 10000</span>
+        <button id="copyBtn" class="btn btn-ghost sm"><i class="fa-regular fa-copy"></i> Copy email</button>
+      </div>
+      <div class="row">
+        <button id="checkBtn" class="btn btn-primary"><span class="spinner" hidden></span><span class="label">Check for Spam</span></button>
+        <button id="clearBtn" class="btn btn-ghost">Clear</button>
+      </div>
+      <div id="result" class="result" hidden aria-live="polite"></div>
+    </div>
+
+    <div class="glass">
+      <h3>Example Emails</h3>
+      <p class="muted">Click one to load it into the box.</p>
+      <div class="examples">
+        <button class="example spam" data-text="Congratulations! You have won ₹10,00,000. Click here to claim your prize immediately."><b><i class="fa-solid fa-triangle-exclamation"></i> Spam Example</b>Congratulations! You have won ₹10,00,000. Click here to claim your prize immediately.</button>
+        <button class="example ham" data-text="Hi Shivam, your interview has been scheduled for tomorrow at 10 AM. Please join the meeting using the provided link."><b><i class="fa-solid fa-circle-check"></i> Safe Example</b>Hi Shivam, your interview has been scheduled for tomorrow at 10 AM. Please join the meeting using the provided link.</button>
+        <button class="example spam" data-text="URGENT: Your bank account has been suspended. Verify your password now at http://secure-bank-login.xyz to avoid closure."><b><i class="fa-solid fa-building-columns"></i> Phishing Example</b>URGENT: Your bank account has been suspended. Verify your password now at http://secure-bank-login.xyz...</button>
+        <button class="example ham" data-text="Hi team, please find attached the minutes of yesterday's project meeting. Let me know if I missed anything."><b><i class="fa-solid fa-briefcase"></i> Work Example</b>Hi team, please find attached the minutes of yesterday's project meeting...</button>
+        <button class="example spam" data-text="Winner! You won a cash prize of $1,000,000. Reply with your bank details to receive the payment today."><b><i class="fa-solid fa-gift"></i> Lottery Example</b>Winner! You won a cash prize of $1,000,000. Reply with your bank details...</button>
+        <button class="example ham" data-text="Reminder: the college assignment on machine learning is due this Friday. Submit it on the portal before 5 PM."><b><i class="fa-solid fa-graduation-cap"></i> College Example</b>Reminder: the college assignment on machine learning is due this Friday...</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section id="how" class="section">
+  <h2>How It Works</h2>
+  <div class="steps">
+    <div class="step"><div class="dot"><i class="fa-solid fa-keyboard"></i></div><h3>Step 1 — Enter Email</h3><p>User enters or pastes email content.</p></div>
+    <div class="step"><div class="dot"><i class="fa-solid fa-broom"></i></div><h3>Step 2 — Text Preprocessing</h3><p>Remove unnecessary characters, convert text to lowercase, remove stopwords, and clean the text.</p></div>
+    <div class="step"><div class="dot"><i class="fa-solid fa-table-cells"></i></div><h3>Step 3 — Feature Extraction</h3><p>Convert the email into numerical features using TF-IDF.</p></div>
+    <div class="step"><div class="dot"><i class="fa-solid fa-robot"></i></div><h3>Step 4 — ML Prediction</h3><p>The trained Machine Learning model predicts Spam or Not Spam.</p></div>
+  </div>
+</section>
+
+<!-- ========== BEHIND THE MODEL ========== -->
+<section id="model" class="section">
+  <h2>Behind the Model</h2>
+  <div class="cards">
+    <div class="glass tech"><i class="fa-brands fa-python"></i><h3>Python</h3><p>Core language for training, the API and all glue code.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-table"></i><h3>Pandas</h3><p>Loads <code>spam.csv</code>, cleans labels and splits the data.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-calculator"></i><h3>NumPy</h3><p>Fast numeric arrays used under the hood by scikit-learn.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-language"></i><h3>NLTK</h3><p>Stopword removal and Porter stemming for text cleaning.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-gears"></i><h3>Scikit-learn</h3><p>Model training, evaluation metrics and saving with Joblib.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-chart-column"></i><h3>TF-IDF</h3><p>Scores words by how unique they are to spam vs. normal mail.</p></div>
+    <div class="glass tech"><i class="fa-solid fa-diagram-project"></i><h3 id="algoName">Naive Bayes / Logistic Regression</h3><p>Both are trained; the one with the better F1 score is used.</p></div>
+  </div>
+</section>
+
+<!-- ========== PERFORMANCE ========== -->
+<section id="performance" class="section">
+  <h2>Model Performance</h2>
+  <p class="muted">Real values calculated on the held-out test set when the model was trained.</p>
+  <div class="cards four" id="metricCards"></div>
+</section>
+
+<!-- ========== DATASET ========== -->
+<section id="dataset" class="section">
+  <h2>Dataset</h2>
+  <p class="muted">The model is trained on a labeled dataset containing spam and legitimate email messages.</p>
+  <div class="cards five" id="datasetCards"></div>
+</section>
+
+<!-- ========== HISTORY ========== -->
+<section id="history" class="section">
+  <h2>Recent Predictions</h2>
+  <div class="glass">
+    <div class="row between">
+      <input id="searchHistory" type="search" placeholder="Search history..." aria-label="Search history">
+      <button id="clearHistory" class="btn btn-ghost sm"><i class="fa-solid fa-trash"></i> Clear History</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Email</th><th>Prediction</th><th>Confidence</th><th>Risk</th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ABOUT ========== -->
+<section id="about" class="section">
+  <h2>About Project</h2>
+  <div class="glass">
+    <p>Spam Email Classifier is a Machine Learning project designed to automatically identify unwanted and potentially harmful email messages. The system uses Natural Language Processing and Machine Learning techniques to analyze email text and classify it as Spam or Not Spam.</p>
+    <dl class="info">
+      <div><dt>Project</dt><dd>Spam Email Classifier</dd></div>
+      <div><dt>Domain</dt><dd>Artificial Intelligence &amp; Machine Learning</dd></div>
+      <div><dt>Technology</dt><dd>Python, Flask, Scikit-learn, NLTK</dd></div>
+      <div><dt>Developer</dt><dd>Shivam Jain</dd></div>
+    </dl>
+  </div>
+</section>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <b>SpamGuard AI — Spam Email Classification using Machine Learning</b>
+  <span>Python | Flask | Scikit-learn | NLP</span>
+  <span>Produced by Shivam Jain</span>
+  <div class="social">
+    <a href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+  </div>
+</footer>
+
+<div id="toasts" aria-live="polite"></div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
